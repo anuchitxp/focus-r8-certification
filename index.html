@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ใบประกาศนียบัตร | Practical Cardiac Ultrasound Region 8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Charmonman:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 landscape; margin: 0; }
+
+  :root{
+    --gold:       #b8892f;
+    --gold-light: #e2c368;
+    --gold-dark:  #8a651d;
+    --green-dark: #0e2a1f;
+    --green:      #17402f;
+    --teal:       #0d4f46;
+    --cream:      #fdf9ee;
+    --ink:        #333333;
+    --red:        #7d1d15;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  body{
+    background:#4a4a4a;
+    font-family:'Sarabun',sans-serif;
+    color:var(--ink);
+  }
+
+  /* ---------- Toolbar (ไม่แสดงตอนพิมพ์) ---------- */
+  .toolbar{ max-width:297mm; margin:14px auto 10px; text-align:center; }
+  .btn{
+    font-family:'Sarabun',sans-serif; font-size:16px; font-weight:600;
+    padding:10px 28px; background:var(--gold); color:#fff;
+    border:none; border-radius:30px; cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,.35);
+  }
+  .btn:hover{ background:var(--gold-dark); }
+  .hint{ color:#e8e8e8; font-size:13px; margin-top:8px; line-height:1.6; }
+  .hint b{ color:#ffd97a; }
+
+  /* ---------- เลือกคำนำหน้าชื่อ (radio) ---------- */
+  .prefix-picker{
+    max-width:297mm; margin:0 auto 12px; text-align:center;
+    color:#e8e8e8; font-size:15px;
+  }
+  .prefix-picker label{
+    display:inline-block; margin:0 10px; cursor:pointer; padding:5px 14px;
+    border:1px solid #777; border-radius:20px;
+  }
+  .prefix-picker input{ margin-right:5px; transform:scale(1.15); vertical-align:middle; }
+  .prefix-picker label:has(input:checked){
+    background:var(--gold); border-color:var(--gold); color:#fff; font-weight:600;
+  }
+
+  /* ---------- กระดาษ A4 แนวนอน ---------- */
+  .sheet{
+    width:297mm; height:210mm;
+    margin:0 auto 16px;
+    background:linear-gradient(135deg,var(--green-dark) 0%,var(--green) 55%,#0b241a 100%);
+    padding:7mm;
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    page-break-inside:avoid;
+  }
+
+  .frame{
+    position:relative;
+    width:100%; height:100%;
+    border-radius:12mm;
+    border:1.1mm solid var(--gold-light);
+    box-shadow:inset 0 0 0 0.35mm var(--gold);
+    background:radial-gradient(ellipse at 25% 12%, #fffdf6 0%, var(--cream) 45%, #f5ecd5 100%);
+    padding:8mm 12mm 9mm;
+    display:flex; flex-direction:column; align-items:center;
+    overflow:hidden;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  /* ลายน้ำสาย ECG */
+  .watermark{
+    position:absolute; left:0; right:0; bottom:28mm;
+    width:100%; height:42mm; opacity:.09; pointer-events:none;
+  }
+
+  /* ---------- ส่วนหัว + โลโก้ (แถวเดียวจัดกึ่งกลาง) ---------- */
+  .head{
+    position:relative; width:100%;
+    display:flex; align-items:center; justify-content:center; gap:10mm;
+  }
+  .logo{
+    width:21mm; height:21mm; border-radius:50%;
+    border:0.3mm dashed #b9a06a; background:#fbf6e8;
+    display:grid; place-items:center; position:relative; overflow:hidden;
+    flex:none;
+  }
+  .logo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+  .logo span{ font-size:8pt; color:#a08a55; text-align:center; line-height:1.25; }
+
+  .head-center{ text-align:center; }
+  .region-th{ font-size:23pt; font-weight:700; color:var(--green); line-height:1.15; }
+  .region-en{ font-size:21pt; font-weight:700; color:var(--green); letter-spacing:2px; }
+  .region-en sup{ font-size:55%; }
+
+  /* ---------- ชื่อเอกสาร ---------- */
+  .doc-title{
+    font-family:'Charmonman',cursive; font-weight:700;
+    font-size:44pt; color:var(--teal); line-height:1.1;
+    margin-top:4mm; text-align:center;
+  }
+  .divider{ display:flex; align-items:center; gap:4mm; width:120mm; margin:2mm auto 0; }
+  .divider .line{ flex:1; height:0.4mm; background:linear-gradient(90deg,transparent,var(--gold)); }
+  .divider .line:last-child{ background:linear-gradient(90deg,var(--gold),transparent); }
+  .divider .diamond{ color:var(--gold); font-size:11pt; line-height:1; }
+
+  /* ---------- เนื้อหา ---------- */
+  .give{ font-size:14pt; color:#666; margin-top:6mm; text-align:center; }
+
+  .name{ font-size:24pt; margin-top:4mm; text-align:center; }
+  .prefix-option{ display:none; }
+  .prefix-option.on{ display:inline; font-weight:600; color:#222; }
+  .fill{
+    font-weight:600; color:#222;
+    outline:none;
+    min-width:2mm; display:inline-block;
+  }
+  .fill:empty::before{ content:'พิมพ์ชื่อ-สกุลที่นี่'; color:#b5b5b5; font-weight:400; }
+  @media print{ .fill:empty::before{ content:''; } }
+
+  .intro{ font-size:14pt; font-weight:600; color:var(--red); margin-top:6mm; text-align:center; }
+
+  .course{
+    font-size:19pt; font-weight:700; color:var(--teal);
+    text-align:center; line-height:1.35; letter-spacing:0.3px;
+  }
+  .course.first{ margin-top:3mm; }
+
+  .year{ font-size:16pt; font-weight:700; color:var(--gold-dark); margin-top:2.5mm; text-align:center; }
+
+  .bless{ font-size:14pt; color:#555; margin-top:9mm; text-align:center; }
+
+  .date{ font-size:14pt; margin-top:3.5mm; text-align:center; }
+  .fill-sm{
+    display:inline-block; min-width:24mm;
+    border-bottom:0.4mm dotted #888; text-align:center; font-weight:600;
+  }
+
+  /* ---------- ลงนาม ---------- */
+  .signs{
+    position:relative; width:100%;
+    display:flex; justify-content:center; gap:32mm;
+    margin-top:auto; padding-top:2mm;
+  }
+  .sign{ width:72mm; text-align:center; position:relative; }
+  .sig-space{ min-height:17mm; }  /* เท่ากับความสูงภาพลายเซ็น 15mm + margin 2mm */
+  .sig-space img{
+    height:15mm; width:auto; object-fit:contain;
+    display:block; margin:0 auto 2mm;
+  }
+  .sig-name{ font-size:13.5pt; font-weight:700; }
+  .sig-pos { font-size:12pt; line-height:1.45; }
+
+  /* ---------- โหมดพิมพ์ ---------- */
+  @media print{
+    html,body{ background:#fff; margin:0; padding:0; }
+    .toolbar{ display:none !important; }
+    .prefix-picker{ display:none !important; }
+    .sheet{
+      margin:0; box-shadow:none;
+      width:297mm; height:209mm;   /* ตัดระยะชดเชยให้พอดีหน้า A4 หนึ่งหน้า */
+      overflow:hidden;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="btn" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+  <div class="hint">
+    <b>วิธีบันทึกเป็น PDF:</b> กดปุ่มด้านบน (หรือ Ctrl+P) → เปลี่ยน Destination เป็น <b>Save as PDF</b> →
+    กระดาษ <b>A4 แนวนอน</b> · Margins <b>None</b> · เปิด <b>Background graphics</b><br>
+    💡 คลิกที่บรรทัด <b>ชื่อ / วันที่ / พื้นที่ลงนาม</b> เพื่อพิมพ์ข้อความได้ทันที &nbsp;•&nbsp;
+    เปลี่ยนโลโก้: แก้ไขแท็ก <b>&lt;img&gt;</b> ในส่วน .logo (ใส่ไฟล์ moph-logo.png และ r8-logo.png ในโฟลเดอร์เดียวกัน)
+  </div>
+</div>
+
+<div class="prefix-picker">
+  คำนำหน้าชื่อ:
+  <label><input type="radio" name="prefix" value="นายแพทย์" checked> นายแพทย์</label>
+  <label><input type="radio" name="prefix" value="แพทย์หญิง"> แพทย์หญิง</label>
+  <label><input type="radio" name="prefix" value="นาย"> นาย</label>
+  <label><input type="radio" name="prefix" value="นาง"> นาง</label>
+  <label><input type="radio" name="prefix" value="นางสาว"> นางสาว</label>
+</div>
+
+<div class="sheet">
+  <div class="frame">
+
+    <!-- ลายน้ำ ECG -->
+    <svg class="watermark" viewBox="0 0 900 160" preserveAspectRatio="none">
+      <path d="M0 80 H260 L278 80 292 25 308 135 322 48 332 80 H540 L556 40 572 120 588 80 H900"
+            fill="none" stroke="#b8892f" stroke-width="3" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- ส่วนหัว: โลโก้ 3 ตัวเรียงกลาง (สธ. → R8 → UDH) -->
+    <div class="head">
+      <div class="logo">
+        <span>ตรา<br>กระทรวง<br>สาธารณสุข</span>
+        <img src="moph-logo.png" alt="ตรากระทรวงสาธารณสุข" onerror="this.remove()">
+      </div>
+      <div class="logo">
+        <span>โลโก้<br>R8<br>Digital Health</span>
+        <img src="r8-logo.png" alt="โลโก้ R8 Digital Health" onerror="this.remove()">
+      </div>
+      <div class="logo">
+        <span>UDH</span>
+        <img src="udh-logo.png" alt="โลโก้ UDH" onerror="this.remove()">
+      </div>
+    </div>
+
+    <!-- ชื่อหน่วยงาน -->
+    <div class="head-center">
+      <div class="region-th">เขตสุขภาพที่ ๘</div>
+      <div class="region-en">REGIONAL HEALTH 8<sup>th</sup></div>
+    </div>
+
+    <!-- ชื่อเอกสาร -->
+    <div class="doc-title">ใบประกาศนียบัตร</div>
+    <div class="divider"><span class="line"></span><span class="diamond">✦</span><span class="line"></span></div>
+
+    <!-- เนื้อหา -->
+    <p class="give">ใบประกาศนียบัตรนี้ให้แก่</p>
+    <p class="name"><span class="prefix-option on" data-prefix="นายแพทย์">นายแพทย์</span><span class="prefix-option" data-prefix="แพทย์หญิง">แพทย์หญิง</span><span class="prefix-option" data-prefix="นาย">นาย</span><span class="prefix-option" data-prefix="นาง">นาง</span><span class="prefix-option" data-prefix="นางสาว">นางสาว</span><span class="fill" contenteditable="true"></span></p>
+
+    <p class="intro">เป็นผู้ผ่านการอบรมหลักสูตร</p>
+    <p class="course first">Practical Cardiac Ultrasound Region 8 :</p>
+    <p class="course">Mastering FoCUS Cardiac Ultrasound for Non-Cardiologist</p>
+    <p class="year">ประจำปี พ.ศ. ๒๕๖๙</p>
+
+    <p class="date">ให้ไว้ ณ วันที่ 6 กันยายน พ.ศ. 2569</p>
+
+    <!-- ลงนาม -->
+    <div class="signs">
+      <div class="sign">
+        <div class="sig-space">
+          <!-- ลายเซ็น นพ.อนุชิต วงศ์เพ็ญ: วางไฟล์ signature-anuchit.png ในโฟลเดอร์เดียวกัน หรือแก้ src เป็น URL รูปลายเซ็น -->
+          <img src="signature-anuchit.png?v=3" alt="ลายเซ็น นพ.อนุชิต วงศ์เพ็ญ" onerror="this.remove()">
+        </div>
+        <p class="sig-name">(นพ.อนุชิต วงศ์เพ็ญ)</p>
+        <p class="sig-pos">ประธาน Service Plan สาขาโรคหัวใจ</p>
+        <p class="sig-pos">เขตสุขภาพที่ ๘</p>
+      </div>
+      <div class="sign">
+        <div class="sig-space">
+          <!-- ลายเซ็น นพ.สามารถ ถิระศักดิ์: วางไฟล์ signature-samarat.png ในโฟลเดอร์เดียวกัน หรือแก้ src เป็น URL รูปลายเซ็น -->
+          <img src="signature-samarat.png" alt="ลายเซ็น นพ.สามารถ ถิระศักดิ์" onerror="this.remove()">
+        </div>
+        <p class="sig-name">(นพ.สามารถ ถิระศักดิ์)</p>
+        <p class="sig-pos">ผู้ตรวจราชการ</p>
+        <p class="sig-pos">เขตสุขภาพที่ ๘</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('input[name="prefix"]').forEach(function(radio){
+    radio.addEventListener('change', function(){
+      document.querySelectorAll('.prefix-option').forEach(function(el){
+        el.classList.toggle('on', el.dataset.prefix === radio.value);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
