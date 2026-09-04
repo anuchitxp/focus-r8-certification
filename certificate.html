@@ -75,7 +75,6 @@
     width:100%; height:100%;
     border-radius:12mm;
     border:1.1mm solid var(--gold-light);
-    box-shadow:inset 0 0 0 0.35mm var(--gold);
     background:radial-gradient(ellipse at 25% 12%, #fffdf6 0%, var(--cream) 45%, #f5ecd5 100%);
     padding:8mm 12mm 9mm;
     display:flex; flex-direction:column; align-items:center;
@@ -272,7 +271,8 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   document.querySelectorAll('input[name="prefix"]').forEach(function(radio){
     radio.addEventListener('change', function(){
@@ -295,21 +295,24 @@
       .join('').replace(/\s+/g, ' ').trim();
     var fname = (name ? 'ใบรับรอง-' + name : 'ใบรับรอง').replace(/[\\/:*?"<>|]/g, '') + '.pdf';
 
-    // ซ่อน placeholder ช่องชื่อ/เงากระดาษ และลดความสูงเป็น 209mm ชั่วคราว
-    // (เหมือนโหมดพิมพ์ — กัน html2pdf ปัดเศษล้นหน้าจนได้หน้าเปล่าท้ายไฟล์)
+    // ซ่อน placeholder ช่องชื่อ/เงากระดาษชั่วคราว (เหมือนโหมดพิมพ์)
     var style = document.createElement('style');
-    style.textContent = '.fill:empty::before{ content:"" !important; } .sheet{ height:209mm !important; margin:0 !important; box-shadow:none !important; }';
+    style.textContent = '.fill:empty::before{ content:"" !important; } .sheet{ margin:0 !important; box-shadow:none !important; }';
     document.head.appendChild(style);
 
     (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
       .then(function(){
-        return html2pdf().set({
-          margin: 0,
-          filename: fname,
-          image: { type:'jpeg', quality:0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-          jsPDF: { unit:'mm', format:'a4', orientation:'landscape' }
-        }).from(document.querySelector('.sheet')).save();
+        // เรนเดอร์ใบรับรองเป็นภาพ (พื้นหลังเขียวเข้ม กันรอยขาวจากการปัดเศษพิกเซล)
+        return html2canvas(document.querySelector('.sheet'), {
+          scale: 2, useCORS: true, logging: false,
+          backgroundColor: '#0e2a1f'
+        });
+      })
+      .then(function(canvas){
+        // วางภาพเต็มหน้า A4 แนวนอนพอดี (297x210mm) ไม่เหลือขอบขาวรอบหน้า
+        var pdf = new jspdf.jsPDF({ unit:'mm', format:'a4', orientation:'landscape' });
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+        pdf.save(fname);
       })
       .catch(function(){
         alert('สร้าง PDF ไม่สำเร็จ กรุณาลองอีกครั้ง');
