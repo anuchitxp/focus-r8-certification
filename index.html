@@ -39,6 +39,9 @@
     box-shadow:0 3px 8px rgba(0,0,0,.35);
   }
   .btn:hover{ background:var(--gold-dark); }
+  .btn-pdf{ background:var(--teal); }
+  .btn-pdf:hover{ background:#0a3d37; }
+  .btn:disabled{ opacity:.55; cursor:wait; }
   .hint{ color:#e8e8e8; font-size:13px; margin-top:8px; line-height:1.6; }
   .hint b{ color:#ffd97a; }
 
@@ -179,10 +182,11 @@
 <body>
 
 <div class="toolbar">
-  <button class="btn" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+  <button class="btn" onclick="window.print()">🖨️ พิมพ์…</button>
+  <button class="btn btn-pdf" id="btn-pdf" onclick="savePdf()">💾 บันทึกเป็น PDF (A4 แนวนอน)</button>
   <div class="hint">
-    <b>วิธีบันทึกเป็น PDF:</b> กดปุ่มด้านบน (หรือ Ctrl+P) → เปลี่ยน Destination เป็น <b>Save as PDF</b> →
-    กระดาษ <b>A4 แนวนอน</b> · Margins <b>None</b> · เปิด <b>Background graphics</b><br>
+    <b>🖨️ พิมพ์…</b> เปิดหน้าต่างพิมพ์ให้เลือกเครื่องพิมพ์ / ตัวเลือกต่าง ๆ ได้ตามต้องการ (หรือกด Ctrl+P)<br>
+    <b>💾 บันทึกเป็น PDF</b> ดาวน์โหลดไฟล์ PDF ขนาด <b>A4 แนวนอน</b> พร้อมใช้ทันที ไม่ต้องตั้งค่า<br>
     💡 คลิกที่บรรทัด <b>ชื่อ / วันที่ / พื้นที่ลงนาม</b> เพื่อพิมพ์ข้อความได้ทันที &nbsp;•&nbsp;
     เปลี่ยนโลโก้: แก้ไขแท็ก <b>&lt;img&gt;</b> ในส่วน .logo (ใส่ไฟล์ moph-logo.png และ r8-logo.png ในโฟลเดอร์เดียวกัน)
   </div>
@@ -256,8 +260,8 @@
       </div>
       <div class="sign">
         <div class="sig-space">
-          <!-- ลายเซ็น นพ.สามารถ ถิระศักดิ์: วางไฟล์ signature-samarat.png ในโฟลเดอร์เดียวกัน หรือแก้ src เป็น URL รูปลายเซ็น -->
-          <img src="signature-samarat.png" alt="ลายเซ็น นพ.สามารถ ถิระศักดิ์" onerror="this.remove()">
+          <!-- ลายเซ็น นพ.สามารถ ถิระศักดิ์: วางไฟล์ signature-samart.png ในโฟลเดอร์เดียวกัน หรือแก้ src เป็น URL รูปลายเซ็น -->
+          <img src="signature-samart.png" alt="ลายเซ็น นพ.สามารถ ถิระศักดิ์" onerror="this.remove()">
         </div>
         <p class="sig-name">(นายสามารถ ถิระศักดิ์)</p>
         <p class="sig-pos">ผู้ตรวจราชการกระทรวงสาธารณสุข</p>
@@ -268,6 +272,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
   document.querySelectorAll('input[name="prefix"]').forEach(function(radio){
     radio.addEventListener('change', function(){
@@ -276,6 +281,44 @@
       });
     });
   });
+
+  function savePdf(){
+    var btn = document.getElementById('btn-pdf');
+    var old = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '⏳ กำลังสร้าง PDF…';
+
+    // ตั้งชื่อไฟล์จากคำนำหน้า + ชื่อผู้รับ (ถ้ามี)
+    var prefix = document.querySelector('.prefix-option.on');
+    var fill = document.querySelector('.name .fill');
+    var name = [prefix && prefix.textContent, fill && fill.textContent]
+      .filter(function(s){ return s && s.trim(); })
+      .join('').replace(/\s+/g, ' ').trim();
+    var fname = (name ? 'ใบรับรอง-' + name : 'ใบรับรอง').replace(/[\\/:*?"<>|]/g, '') + '.pdf';
+
+    // ซ่อน placeholder ช่องชื่อ/เงากระดาษ และลดความสูงเป็น 209mm ชั่วคราว
+    // (เหมือนโหมดพิมพ์ — กัน html2pdf ปัดเศษล้นหน้าจนได้หน้าเปล่าท้ายไฟล์)
+    var style = document.createElement('style');
+    style.textContent = '.fill:empty::before{ content:"" !important; } .sheet{ height:209mm !important; margin:0 !important; box-shadow:none !important; }';
+    document.head.appendChild(style);
+
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+      .then(function(){
+        return html2pdf().set({
+          margin: 0,
+          filename: fname,
+          image: { type:'jpeg', quality:0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit:'mm', format:'a4', orientation:'landscape' }
+        }).from(document.querySelector('.sheet')).save();
+      })
+      .catch(function(){
+        alert('สร้าง PDF ไม่สำเร็จ กรุณาลองอีกครั้ง');
+      })
+      .finally(function(){
+        style.remove();
+        btn.disabled = false; btn.innerHTML = old;
+      });
+  }
 </script>
 
 </body>
